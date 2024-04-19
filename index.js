@@ -25,7 +25,14 @@ const PRIVATE_APP_ACCESS = '';
 /** 
 * * This is sample code to give you a reference for how you should structure your calls. 
 
-* * App.get sample
+app.get('/contacts', async (req, res) => {
+* * App.get sample*/
+
+
+app.get('/', async (req, res) => {
+    res.render('index', { title: 'Home'});
+});
+
 app.get('/contacts', async (req, res) => {
     const contacts = 'https://api.hubspot.com/crm/v3/objects/contacts';
     const headers = {
@@ -35,13 +42,33 @@ app.get('/contacts', async (req, res) => {
     try {
         const resp = await axios.get(contacts, { headers });
         const data = resp.data.results;
-        res.render('contacts', { title: 'Contacts | HubSpot APIs', data });      
+        res.render('contacts', { title: 'Update Custom Object Form | Integrating With HubSpot I Practicum.', data });
     } catch (error) {
         console.error(error);
     }
 });
 
-* * App.post sample
+app.get('/update', async (req, res) => {
+    const email = req.query.email;
+
+    const getContact = `https://api.hubapi.com/crm/v3/objects/contacts/${email}?idProperty=email&properties=email,favorite_book`;
+    const headers = {
+        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+        'Content-Type': 'application/json'
+    };
+
+    try {
+        const response = await axios.get(getContact, { headers });
+        const data = response.data;
+
+        res.render('update', {userEmail: data.properties.email, favoriteBook: data.properties.favorite_book});
+        
+    } catch(err) {
+        console.error(err);
+    }
+});
+
+/* App.post sample */
 app.post('/update', async (req, res) => {
     const update = {
         properties: {
@@ -64,8 +91,6 @@ app.post('/update', async (req, res) => {
     }
 
 });
-*/
-
 
 // * Localhost
 app.listen(3000, () => console.log('Listening on http://localhost:3000'));
